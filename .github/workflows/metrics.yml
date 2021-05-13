@@ -12,6 +12,12 @@ jobs:
         with:
           # Your GitHub token
           token: ${{ secrets.METRICS_TOKEN }}
+          config_padding: 6%, 20%
           plugin_languages: yes
           plugin_languages_threshold: 2%                               # Hides all languages less than 2%
           plugin_languages_limit: 8                                    # Display up to 8 languages
+          plugin_languages_ignored: "Jupyter Notebook"
+          plugin_projects: yes
+          plugin_activity: yes
+          plugin_notable: yes
+          plugin_habits: yes
