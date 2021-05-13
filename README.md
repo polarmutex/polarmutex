@@ -13,9 +13,4 @@ Here are some ideas to get you started:
 - ⚡ Fun fact: ...
 -->
 
-<a href="https://github.com/anuraghazra/github-readme-stats">
-  <img align="center" src="https://github-readme-stats.vercel.app/api/top-langs/?username=polarmutex&layout=compact&theme=gruvbox&langs_count=6&hide_border=true&card_width=445" width=49.3%/>
-</a>
-<a href="https://github.com/anuraghazra/github-readme-stats">
-  <img align="center" src="https://github-readme-stats.vercel.app/api?username=polarmutex&show_icons=true&theme=gruvbox&include_all_commits=true&hide_title=true&count_private=true&hide_border=true" width=49.3%/>
-</a>
+![Metrics](https://github.com/polarmutex/polarmutex/blob/main/github-metrics.svg)
