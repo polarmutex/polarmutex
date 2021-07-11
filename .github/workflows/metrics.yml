@@ -1,7 +1,8 @@
+# Visit https://github.com/lowlighter/metrics/blob/master/action.yml for full reference
 name: Metrics
 on:
   # Schedule updates (each hour)
-  schedule: [{cron: "0 0 * * 0"}]
+  schedule: [{cron: "0 * * * *"}]
   push: {branches: ["master", "main"]}
 jobs:
   github-metrics:
@@ -12,10 +13,35 @@ jobs:
         with:
           # Your GitHub token
           token: ${{ secrets.METRICS_TOKEN }}
-          config_padding: 6%, 20%
-          plugin_languages: yes
-          plugin_languages_threshold: 2%                               # Hides all languages less than 2%
-          plugin_languages_limit: 8                                    # Display up to 8 languages
-          plugin_languages_ignored: "Jupyter Notebook"
-          plugin_notable: yes
+
+          # Options
+          user: polarmutex
+          template: classic
+          base: header, activity, community, repositories, metadata
+          config_timezone: Asia/Tokyo
+          plugin_achievements: yes
+          plugin_achievements_secrets: yes
+          plugin_achievements_threshold: C
+          plugin_followup: yes
+          plugin_followup_sections: repositories
           plugin_habits: yes
+          plugin_habits_days: 14
+          plugin_habits_facts: yes
+          plugin_habits_from: 200
+          plugin_isocalendar: yes
+          plugin_isocalendar_duration: half-year
+          plugin_languages: yes
+          plugin_languages_colors: github
+          plugin_languages_limit: 8
+          plugin_languages_recent.days: 14
+          plugin_languages_recent.load: 300
+          plugin_languages_sections: most-used
+          plugin_languages_threshold: 0%
+          plugin_notable: yes
+          plugin_people: yes
+          plugin_people_limit: 24
+          plugin_people_size: 28
+          plugin_people_types: followers, following
+          plugin_projects: yes
+          plugin_projects_limit: 4
+          plugin_support: yes
