@@ -1,0 +1,207 @@
+#!/usr/bin/env python3
+
+import json
+import os
+import re
+from datetime import datetime
+from itertools import chain
+from urllib.request import Request, urlopen
+
+created = [
+    ("polarmutex", "beancount-language-server"),
+    ("polarmutex", "tree-sitter-beancount"),
+    ("polarmutex", "fava-envelope"),
+    ("polarmutex", "nix-config"),
+    ("polarmutex", "neovim-flake"),
+    ("polarmutex", "awesome-flake"),
+]
+
+maintain = [
+    ("nixos", "nixpkgs"),
+]
+
+contributed = [
+]
+
+query = """
+{
+  issues: search(type: ISSUE, query: "author:polarmutex is:issue") {
+    issueCount
+  }
+
+  prs: search(type: ISSUE, query: "author:polarmutex is:pr") {
+    issueCount
+  }
+
+  user(login: "polarmutex") {
+    followers { totalCount }
+    following { totalCount }
+    gists { totalCount }
+    issues { totalCount }
+    pullRequests { totalCount }
+    repositories(first: 100, isFork: false, privacy: PUBLIC) {
+      totalCount
+      nodes {
+        forkCount
+        languages(first: 100) {
+          edges {
+            node { name }
+            size
+          }
+        }
+        stargazerCount
+        viewerPermission
+      }
+    }
+    repositoriesContributedTo(privacy: PUBLIC) {
+      totalCount
+    }
+  }
+"""
+
+for owner, repo in chain(created, maintain):
+    query += f"""
+  {repo.replace("-", "_").replace(".", "_")}: repository(owner: "{owner}", name: "{repo}") {{
+    description
+    stargazerCount
+  }}
+"""
+
+query += "}"
+
+commits = json.load(
+    urlopen(
+        Request(
+            "https://api.github.com/search/commits?q=author:polarmutex&per_page=1",
+            headers={"Accept": "application/vnd.github.cloak-preview"},
+        )
+    )
+)["total_count"]
+
+data = json.load(
+    urlopen(
+        Request(
+            "https://api.github.com/graphql",
+            json.dumps({"query": query}).encode("ascii"),
+            {"Authorization": f"token {os.environ['TOKEN']}"},
+        )
+    )
+)["data"]
+user = data["user"]
+
+forks = 0
+langs = {}
+size = 0
+stars = 0
+
+for repo in user["repositories"]["nodes"]:
+    if repo["viewerPermission"] != "ADMIN":
+        continue
+
+    forks += repo["forkCount"]
+    stars += repo["stargazerCount"]
+    for lang in repo["languages"]["edges"]:
+        size += lang["size"]
+        name = lang["node"]["name"]
+        langs[name] = langs.get(name, 0) + lang["size"]
+
+
+regex = re.compile(r"^(.*?)\s*\[maintainer[^\]]+\]\s*$")
+
+
+def add_repos(repos):
+    global data
+    global readme
+    global regex
+
+    for owner, repo in sorted(
+        repos,
+        key=lambda x: int(
+            data[x[1].replace("-", "_").replace(".", "_")]["stargazerCount"]
+        ),
+        reverse=True,
+    ):
+        repo_data = data[repo.replace("-", "_").replace(".", "_")]
+        description = repo_data["description"]
+
+        if owner == "nix-community":
+            description = regex.sub(r"\1", description)
+
+        readme += f"- [**{repo}**](https://github.com/{owner}/{repo}) (⭐ {repo_data['stargazerCount']}) - {description}\n"
+
+
+readme = "#### Projects I created\n\n"
+add_repos(created)
+readme += "\n#### Projects I help maintain\n\n"
+add_repos(maintain)
+
+readme += f"""
+<table>
+  <tr align="center">
+    <td><b>Statistics</b></td>
+    <td><b>Languages</b></td>
+  </tr>
+  <tr valign="top">
+    <td><table>
+      <tr>
+        <td>Repositories</td>
+        <td><a href="https://github.com/polarmutex?tab=repositories">
+          {user["repositories"]["totalCount"]}
+        </a></td>
+      </tr>
+      <tr>
+        <td>Gists</td>
+        <td><a href="https://gist.github.com/polarmutex">
+          {user["gists"]["totalCount"]}
+        </a></td>
+      </tr>
+      <tr>
+        <td>Stargazers</td>
+        <td>{stars}</td>
+      </tr>
+      <tr>
+        <td>Forks</td>
+        <td>{forks}</td>
+      </tr>
+      <tr>
+        <td>Contributed to</td>
+        <td>{user["repositoriesContributedTo"]["totalCount"]}</td>
+      </tr>
+      <tr>
+        <td>Commits</td>
+        <td>{commits}</td>
+      </tr>
+      <tr>
+        <td>Issues</td>
+        <td>{data["issues"]["issueCount"]}</td>
+      </tr>
+      <tr>
+        <td>Pull requests</td>
+        <td>{data["prs"]["issueCount"]}</td>
+      </tr>
+      <tr>
+        <td>Followers</td>
+        <td><a href="https://github.com/polarmutex?tab=followers">
+          {user["followers"]["totalCount"]}
+        </a></td>
+      </tr>
+      <tr>
+        <td>Following</td>
+        <td><a href="https://github.com/polarmutex?tab=following">
+          {user["following"]["totalCount"]}
+        </a></td>
+      </tr>
+    </table></td>
+    <td><table>"""
+
+for k, v in sorted(langs.items(), key=lambda x: x[1], reverse=True)[:10]:
+    readme += f"<tr><td>{k}</td><td>{round(v / size * 100, 2)}%</td></tr>"
+
+readme += f"""</table></td>
+  </tr>
+</table>
+
+<sub>Last updated: {datetime.utcnow().strftime("%F %T")} UTC</sub>
+"""
+
+open("README.md", "w").write(readme)
