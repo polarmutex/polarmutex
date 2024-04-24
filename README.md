@@ -3,13 +3,15 @@
 - [**beancount-language-server**](https://github.com/polarmutex/beancount-language-server) (⭐ 128) - A Language Server Protocol (LSP) for beancount files
 - [**fava-envelope**](https://github.com/polarmutex/fava-envelope) (⭐ 96) - A beancount fava extension to add a envelope budgeting capability
 - [**tree-sitter-beancount**](https://github.com/polarmutex/tree-sitter-beancount) (⭐ 25) - a tree-sitter parser for the beancount syntax
+- [**git-worktree.nvim**](https://github.com/polarmutex/git-worktree.nvim) (⭐ 20) - None
+- [**beancount.nvim**](https://github.com/polarmutex/beancount.nvim) (⭐ 7) - neovim plugin to help with beancount files
 - [**nix-config**](https://github.com/polarmutex/nix-config) (⭐ 6) - nix dotfiles for nixos and userspace
 - [**neovim-flake**](https://github.com/polarmutex/neovim-flake) (⭐ 4) - my neovim config as a nix flake
 - [**awesome-flake**](https://github.com/polarmutex/awesome-flake) (⭐ 1) - my awesome wm config as a nixos flake
 
 #### Projects I help maintain
 
-- [**nixpkgs**](https://github.com/nixos/nixpkgs) (⭐ 15645) - Nix Packages collection & NixOS
+- [**nixpkgs**](https://github.com/nixos/nixpkgs) (⭐ 15652) - Nix Packages collection & NixOS
 
 <table>
   <tr align="center">
@@ -71,4 +73,4 @@
   </tr>
 </table>
 
-<sub>Last updated: 2024-04-24 00:07:21 UTC</sub>
+<sub>Last updated: 2024-04-24 14:35:32 UTC</sub>
